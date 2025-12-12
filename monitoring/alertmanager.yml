@@ -1,0 +1,35 @@
+global:
+  smtp_smarthost: 'smtp.gmail.com:587'
+  smtp_from: 'rayenkaddechi1234@gmail.com'
+  smtp_auth_username: 'rayenkaddechi1234@gmail.com'
+  smtp_auth_password: 'ldgamksnxrbhbeuf'
+  smtp_require_tls: true
+
+route:
+  group_by: ['alertname']
+  receiver: 'rayen-alerts'
+
+receivers:
+- name: 'rayen-alerts'
+  email_configs:
+  - to: 'rayen.kaddechi@esprit.tn'
+    headers:
+      subject: '🚨 [Breast Cancer API Alert] {{ .GroupLabels.alertname }}'
+    html: |
+      <html>
+      <body style="font-family: Arial, sans-serif;">
+        <h2 style="color: #e74c3c;">🚨 Breast Cancer API Alert</h2>
+        <p><strong>Alert:</strong> {{ .GroupLabels.alertname }}</p>
+        <p><strong>Time:</strong> {{ .Alerts.0.StartsAt }}</p>
+        <p><strong>Summary:</strong> {{ .CommonAnnotations.summary }}</p>
+        <div style="background: #f8f9fa; padding: 15px; margin: 15px 0;">
+          <p>Check the API immediately: <a href="http://localhost:8000">http://localhost:8000</a></p>
+          <p>View metrics: <a href="http://localhost:9090">http://localhost:9090</a></p>
+        </div>
+        <p style="color: #666; font-size: 12px;">
+          Sent to: rayen.kaddechi@esprit.tn<br>
+          System: Breast Cancer Detection API
+        </p>
+      </body>
+      </html>
+    send_resolved: true

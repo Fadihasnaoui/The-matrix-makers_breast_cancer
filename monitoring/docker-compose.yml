@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    container_name: breast-cancer-api
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONPATH=/app
+      - ENVIRONMENT=production
+    volumes:
+      - ./app:/app/app
+      - ./models:/app/models
+      - ./logs:/app/logs
+      - ./static:/app/static
+      - ./templates:/app/templates
+    restart: unless-stopped
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus-monitoring
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    restart: unless-stopped
+    networks:
+      - app-network
+    depends_on:
+      - api
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana-dashboard
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    restart: unless-stopped
+    networks:
+      - app-network
+    depends_on:
+      - prometheus
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local

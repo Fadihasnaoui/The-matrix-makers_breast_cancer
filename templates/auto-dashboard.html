@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Live API Dashboard</title>
+    <meta http-equiv="refresh" content="10">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .metric { background: #f5f5f5; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .metric h3 { margin-top: 0; }
+        .value { font-size: 24px; font-weight: bold; }
+        .up { color: green; }
+        .down { color: red; }
+    </style>
+</head>
+<body>
+    <h1>📈 Live API Dashboard</h1>
+    <p>Auto-refreshes every 10 seconds | Last update: <span id="time"></span></p>
+    
+    <div class="metric">
+        <h3>API Status</h3>
+        <div class="value" id="status">Checking...</div>
+    </div>
+    
+    <div class="metric">
+        <h3>Total Requests</h3>
+        <div class="value" id="totalRequests">0</div>
+    </div>
+    
+    <div class="metric">
+        <h3>Predictions Made</h3>
+        <div class="value" id="predictions">0</div>
+    </div>
+    
+    <div class="metric">
+        <h3>Memory Usage</h3>
+        <div class="value" id="memory">0 MB</div>
+    </div>
+    
+    <div class="metric">
+        <h3>Model Accuracy</h3>
+        <div class="value" id="accuracy">0%</div>
+    </div>
+    
+    <script>
+        // Update time
+        document.getElementById('time').textContent = new Date().toLocaleTimeString();
+        
+        // Fetch data
+        async function updateMetrics() {
+            try {
+                // API health
+                const healthRes = await fetch('/health');
+                const health = await healthRes.json();
+                document.getElementById('status').textContent = health.status.toUpperCase();
+                document.getElementById('status').className = 'value ' + (health.status === 'healthy' ? 'up' : 'down');
+                
+                // Model info
+                const modelRes = await fetch('/model/info');
+                const model = await modelRes.json();
+                if (model.status === 'loaded') {
+                    document.getElementById('accuracy').textContent = (model.accuracy * 100).toFixed(1) + '%';
+                }
+                
+                // Health contains some metrics
+                document.getElementById('predictions').textContent = health.predictions_made || 0;
+                
+                // Get more metrics from /metrics
+                const metricsRes = await fetch('/metrics');
+                const metrics = await metricsRes.text();
+                
+                // Parse metrics
+                const lines = metrics.split('\n');
+                let totalRequests = 0;
+                let memory = 0;
+                
+                for (const line of lines) {
+                    if (line.startsWith('http_requests_total')) {
+                        const value = line.split(' ')[1];
+                        totalRequests += parseFloat(value) || 0;
+                    }
+                    if (line.startsWith('process_resident_memory_bytes')) {
+                        const value = line.split(' ')[1];
+                        memory = Math.round(parseFloat(value) / 1024 / 1024);
+                    }
+                }
+                
+                document.getElementById('totalRequests').textContent = totalRequests;
+                document.getElementById('memory').textContent = memory + ' MB';
+                
+            } catch (error) {
+                console.error('Error fetching metrics:', error);
+            }
+        }
+        
+        updateMetrics();
+    </script>
+</body>
+</html>

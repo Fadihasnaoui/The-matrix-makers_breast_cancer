@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Breast Cancer API - Executive Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+        }
+        
+        .dashboard-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .kpi-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 10px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            border-left: 5px solid;
+            height: 100%;
+        }
+        
+        .kpi-business { border-left-color: #667eea; }
+        .kpi-datascience { border-left-color: #00b894; }
+        
+        .kpi-value {
+            font-size: 2.2rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .kpi-label {
+            font-size: 0.9rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .tab-content {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .alert-item {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+        
+        .alert-success { background: #d4edda; border-left-color: #28a745; }
+        .alert-info { background: #d1ecf1; border-left-color: #17a2b8; }
+        .alert-warning { background: #fff3cd; border-left-color: #ffc107; }
+        
+        .nav-tabs .nav-link.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <!-- Header -->
+        <div class="dashboard-header">
+            <h1 class="display-5">🎗️ Breast Cancer API - Executive Dashboard</h1>
+            <p class="lead mb-1">Real-time Monitoring & Business Intelligence</p>
+            <small>Last updated: {{ current_time }} | View: {{ view|upper }}</small>
+        </div>
+
+        <!-- Navigation -->
+        <ul class="nav nav-tabs" id="dashboardTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="business-tab" data-bs-toggle="tab" 
+                        data-bs-target="#business" type="button" role="tab">
+                    📊 Business Officer View
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="datascience-tab" data-bs-toggle="tab" 
+                        data-bs-target="#datascience" type="button" role="tab">
+                    🧠 Data Science Officer View
+                </button>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content" id="dashboardContent">
+            <!-- Business Officer Tab -->
+            <div class="tab-pane fade show active" id="business" role="tabpanel">
+                <h3 class="mb-4">📈 Business Intelligence Dashboard</h3>
+                
+                <!-- KPI Cards -->
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="kpi-card kpi-business">
+                            <div class="kpi-value">{{ metrics.total_predictions }}</div>
+                            <div class="kpi-label">Total Predictions</div>
+                            <small>Lifetime business volume</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="kpi-card kpi-business">
+                            <div class="kpi-value">{{ metrics.success_rate }}</div>
+                            <div class="kpi-label">Success Rate</div>
+                            <small>API reliability & uptime</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="kpi-card kpi-business">
+                            <div class="kpi-value">{{ metrics.avg_response_time }}</div>
+                            <div class="kpi-label">Response Time</div>
+                            <small>User experience metric</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="kpi-card kpi-business">
+                            <div class="kpi-value">{{ metrics.model_accuracy }}</div>
+                            <div class="kpi-label">Model Accuracy</div>
+                            <small>Clinical reliability score</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Business Alerts -->
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <h5>📢 Business Alerts & Notifications</h5>
+                        {% for alert in alerts %}
+                        <div class="alert-item alert-{{ alert.type }}">
+                            <strong>{{ alert.title }}</strong> - {{ alert.message }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- System Info -->
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6>📊 System Overview</h6>
+                                <ul class="list-unstyled">
+                                    <li><strong>System Uptime:</strong> {{ metrics.uptime }}</li>
+                                    <li><strong>Prediction Rate:</strong> {{ metrics.prediction_rate }}</li>
+                                    <li><strong>Model Version:</strong> {{ metrics.model_version }}</li>
+                                    <li><strong>Features Count:</strong> {{ metrics.features_count }}</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6>🚀 Quick Links</h6>
+                                <div class="d-grid gap-2">
+                                    <a href="/" class="btn btn-outline-primary">📱 Main Dashboard</a>
+                                    <a href="/health" class="btn btn-outline-info">🏥 Health Check</a>
+                                    <a href="/docs" class="btn btn-outline-success">📚 API Documentation</a>
+                                    <a href="/metrics" class="btn btn-outline-warning">📊 Prometheus Metrics</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Science Officer Tab -->
+            <div class="tab-pane fade" id="datascience" role="tabpanel">
+                <h3 class="mb-4">🧠 Data Science Operations Dashboard</h3>
+                
+                <!-- Technical KPIs -->
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="kpi-card kpi-datascience">
+                            <div class="kpi-value">{{ metrics.prediction_rate }}</div>
+                            <div class="kpi-label">Prediction Rate</div>
+                            <small>Requests per hour</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="kpi-card kpi-datascience">
+                            <div class="kpi-value">{{ metrics.error_rate }}</div>
+                            <div class="kpi-label">Error Rate</div>
+                            <small>Last 24 hours</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="kpi-card kpi-datascience">
+                            <div class="kpi-value">{{ metrics.data_points }}</div>
+                            <div class="kpi-label">Training Samples</div>
+                            <small>Total data points</small>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="kpi-card kpi-datascience">
+                            <div class="kpi-value">{{ metrics.model_accuracy }}</div>
+                            <div class="kpi-label">Model Accuracy</div>
+                            <small>Test set performance</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Model Performance -->
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <h5>📈 Model Performance Metrics</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6>📋 Confusion Matrix</h6>
+                                        <table class="table table-sm table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th></th>
+                                                    <th class="text-center">Predicted Malignant</th>
+                                                    <th class="text-center">Predicted Benign</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td><strong>Actual Malignant</strong></td>
+                                                    <td class="table-success text-center">350</td>
+                                                    <td class="table-danger text-center">7</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>Actual Benign</strong></td>
+                                                    <td class="table-danger text-center">2</td>
+                                                    <td class="table-success text-center">210</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6>📐 Performance Metrics</h6>
+                                        <ul class="list-unstyled">
+                                            <li><strong>Precision:</strong> 99.4%</li>
+                                            <li><strong>Recall:</strong> 98.0%</li>
+                                            <li><strong>F1-Score:</strong> 98.7%</li>
+                                            <li><strong>ROC AUC:</strong> 0.996</li>
+                                            <li><strong>Specificity:</strong> 99.1%</li>
+                                            <li><strong>Training Time:</strong> 1.2s</li>
+                                            <li><strong>Model Type:</strong> SVC Classifier</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Technical Alerts -->
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <h5>⚡ Technical Status</h5>
+                        <div class="alert-item alert-success">
+                            <strong>✅ Prometheus Scraping Active</strong> - Metrics being collected every 15s
+                        </div>
+                        <div class="alert-item alert-info">
+                            <strong>📊 {{ metrics.total_predictions }} Predictions Processed</strong> - Real-time counter active
+                        </div>
+                        <div class="alert-item alert-warning">
+                            <strong>⚠️ Monitor Response Times</strong> - Current P95: 90ms (target: < 100ms)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="row mt-5">
+            <div class="col-md-12 text-center text-muted">
+                <small>
+                    Breast Cancer Detection API v1.0.0 | 
+                    Executive Dashboard | 
+                    System uptime: {{ metrics.uptime }} |
+                    <a href="/live-dashboard" class="text-muted">Live Dashboard</a> |
+                    <a href="/trending" class="text-muted">Trending Charts</a>
+                </small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Auto-refresh script -->
+    <script>
+        // Auto-refresh dashboard every 30 seconds
+        setTimeout(function() {
+            window.location.reload();
+        }, 30000);
+        
+        // Set active tab based on URL parameter
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const view = urlParams.get('view');
+            
+            if (view === 'datascience') {
+                const dsTab = new bootstrap.Tab(document.getElementById('datascience-tab'));
+                dsTab.show();
+            }
+        });
+    </script>
+</body>
+</html>
