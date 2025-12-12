@@ -38,6 +38,7 @@
             transition: all 0.3s ease;
             cursor: pointer;
             margin-bottom: 15px;
+            height: 100%;
         }
 
         .model-card:hover {
@@ -143,6 +144,13 @@
             background: linear-gradient(90deg, #e5ffe5, #ccffcc);
             border-left: 4px solid var(--success);
         }
+        
+        .metric-badge {
+            font-size: 0.85rem;
+            padding: 3px 8px;
+            border-radius: 12px;
+            margin-left: 5px;
+        }
     </style>
 </head>
 <body>
@@ -151,8 +159,8 @@
         <div class="master-header">
             <div class="row align-items-center">
                 <div class="col-md-8">
-                    <h1><i class="bi bi-heart-pulse"></i> Breast Cancer Detection System</h1>
-                    <p class="mb-0">Complete ML Pipeline with Model Selection & PCA Analysis</p>
+                    <h1><i class="bi bi-heart-pulse"></i> Breast Cancer Detection System v5.0</h1>
+                    <p class="mb-0">Complete ML Pipeline with 8 Models, ROC Analysis & Business Objectives</p>
                 </div>
                 <div class="col-md-4 text-end">
                     <div class="bg-white text-dark rounded p-3">
@@ -162,7 +170,10 @@
                         <small id="modelStatus">Loading models...</small>
                         <br>
                         <a href="/analysis" class="btn btn-info btn-sm mt-2">
-                            <i class="bi bi-bar-chart-line"></i> Advanced Analysis
+                            <i class="bi bi-bar-chart-line"></i> Complete Analysis
+                        </a>
+                        <a href="/analysis/roc" class="btn btn-warning btn-sm mt-2">
+                            <i class="bi bi-graph-up"></i> ROC Analysis
                         </a>
                     </div>
                 </div>
@@ -178,7 +189,7 @@
             </li>
             <li class="nav-item">
                 <a class="nav-link" data-bs-toggle="tab" href="#models">
-                    <i class="bi bi-cpu"></i> Model Selection
+                    <i class="bi bi-cpu"></i> 8 Model Selection
                 </a>
             </li>
             <li class="nav-item">
@@ -189,6 +200,11 @@
             <li class="nav-item">
                 <a class="nav-link" data-bs-toggle="tab" href="#monitoring">
                     <i class="bi bi-speedometer2"></i> Monitoring
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#artifacts">
+                    <i class="bi bi-archive"></i> Artifacts
                 </a>
             </li>
         </ul>
@@ -208,14 +224,21 @@
                             <div class="card-body">
                                 <h4 id="currentModelName">Loading...</h4>
                                 <div class="row text-center mb-3">
-                                    <div class="col-6">
+                                    <div class="col-4">
                                         <div class="display-6 text-success" id="currentModelAccuracy">-</div>
                                         <small class="text-muted">Accuracy</small>
                                     </div>
-                                    <div class="col-6">
+                                    <div class="col-4">
                                         <div class="display-6 text-info" id="currentModelRecall">-</div>
                                         <small class="text-muted">Recall</small>
                                     </div>
+                                    <div class="col-4">
+                                        <div class="display-6 text-warning" id="currentModelF1">-</div>
+                                        <small class="text-muted">F1 Score</small>
+                                    </div>
+                                </div>
+                                <div class="alert alert-info p-2 mb-3">
+                                    <small><i class="bi bi-info-circle"></i> <strong id="modelType">Type: Loading...</strong></small>
                                 </div>
                                 <button class="btn btn-outline-primary w-100" onclick="refreshModels()">
                                     <i class="bi bi-arrow-clockwise"></i> Refresh Models
@@ -228,6 +251,18 @@
                             <div class="card-body">
                                 <h4><i class="bi bi-clipboard-check"></i> Prediction Result</h4>
                                 <div id="resultContent"></div>
+                            </div>
+                        </div>
+
+                        <!-- ROC Curve -->
+                        <div class="card mt-3" id="rocCard" style="display: none;">
+                            <div class="card-header bg-warning text-white">
+                                <h5 class="mb-0"><i class="bi bi-graph-up"></i> ROC Analysis</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="rocContent">
+                                    <p class="text-muted">Make a prediction to see ROC analysis</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -263,6 +298,9 @@
                                     <button class="btn btn-info w-100 mt-2" onclick="generateSHAPExplanation()" id="shapButton">
                                         <i class="bi bi-magic"></i> Explain Prediction with SHAP
                                     </button>
+                                    <button class="btn btn-warning w-100 mt-2" onclick="getROCAnalysis()" id="rocButton">
+                                        <i class="bi bi-graph-up"></i> Get ROC Analysis
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -270,7 +308,7 @@
                         <!-- Quick Model Select -->
                         <div class="card mt-3">
                             <div class="card-body">
-                                <h5><i class="bi bi-lightning"></i> Quick Model Select</h5>
+                                <h5><i class="bi bi-lightning"></i> Quick Model Select (8 Models)</h5>
                                 <div class="row" id="quickModelSelect">
                                     <!-- Quick buttons will be loaded here -->
                                 </div>
@@ -294,7 +332,7 @@
 
             <!-- Model Selection Tab -->
             <div class="tab-pane fade" id="models">
-                <h3><i class="bi bi-cpu"></i> Model Selection</h3>
+                <h3><i class="bi bi-cpu"></i> 8 Model Selection</h3>
                 <p>Click any model to activate it for predictions:</p>
 
                 <div class="row" id="modelsGrid">
@@ -303,11 +341,26 @@
 
                 <div class="mt-4">
                     <button class="btn btn-primary" onclick="retrainModels()">
-                        <i class="bi bi-arrow-repeat"></i> Retrain All Models
+                        <i class="bi bi-arrow-repeat"></i> Retrain All Models (8)
                     </button>
                     <button class="btn btn-success" onclick="refreshModels()">
                         <i class="bi bi-arrow-clockwise"></i> Refresh List
                     </button>
+                    <button class="btn btn-warning" onclick="showBestModels()">
+                        <i class="bi bi-trophy"></i> Show Best Models
+                    </button>
+                </div>
+
+                <!-- Best Models Summary -->
+                <div class="card mt-4" id="bestModelsCard" style="display: none;">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="bi bi-trophy"></i> Best Models by Metric</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row" id="bestModelsContent">
+                            <!-- Best models will be loaded here -->
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -392,6 +445,9 @@
                                     <a href="/docs" target="_blank" class="list-group-item list-group-item-action">
                                         <i class="bi bi-code-slash"></i> API Documentation
                                     </a>
+                                    <a href="/analysis" target="_blank" class="list-group-item list-group-item-action">
+                                        <i class="bi bi-bar-chart-line"></i> Complete Analysis
+                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -429,6 +485,55 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Business Objectives -->
+                <div class="card mt-3">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="bi bi-bullseye"></i> Business Objectives Status</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="businessObjectives">
+                            <p class="text-muted">Loading business objectives...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Artifacts Tab -->
+            <div class="tab-pane fade" id="artifacts">
+                <h3><i class="bi bi-archive"></i> Artifact System</h3>
+                <p>Model artifacts and registry:</p>
+
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5><i class="bi bi-box-seam"></i> Artifact Information</h5>
+                                <div id="artifactInfo">
+                                    <p class="text-muted">Loading artifact information...</p>
+                                </div>
+                                <button class="btn btn-primary mt-3" onclick="loadArtifactInfo()">
+                                    <i class="bi bi-arrow-clockwise"></i> Refresh Artifacts
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5><i class="bi bi-info-circle"></i> About Artifacts</h5>
+                                <p>The artifact system organizes all ML components:</p>
+                                <ul>
+                                    <li><strong>Models/</strong>: Serialized model files</li>
+                                    <li><strong>Metrics/</strong>: Performance metrics</li>
+                                    <li><strong>Features/</strong>: Feature names and data</li>
+                                    <li><strong>Visualizations/</strong>: Plots and charts</li>
+                                </ul>
+                                <p class="mt-3"><strong>Registry:</strong> Tracks all trained models with metadata.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -440,6 +545,7 @@
         let featureNames = [];
         let sampleValues = [];
         let compactView = false;
+        let bestModels = {};
 
         // Load data on page load
         document.addEventListener('DOMContentLoaded', function() {
@@ -447,6 +553,8 @@
             loadAllModels();
             loadPCA();
             startHealthMonitoring();
+            loadBusinessObjectives();
+            loadArtifactInfo();
         });
 
         async function loadInitialData() {
@@ -521,6 +629,7 @@
                 const response = await fetch('/models');
                 const data = await response.json();
                 allModels = data.available_models;
+                bestModels = data.best_models || {};
 
                 // Update model count
                 document.getElementById('modelStatus').textContent =
@@ -532,6 +641,7 @@
                     updateCurrentModelDisplay();
                     generateModelsGrid();
                     generateQuickSelect();
+                    updateBestModelsDisplay();
                 }
 
             } catch (error) {
@@ -546,6 +656,9 @@
                     (currentModel.accuracy * 100).toFixed(1) + '%';
                 document.getElementById('currentModelRecall').textContent =
                     (currentModel.recall * 100).toFixed(1) + '%';
+                document.getElementById('currentModelF1').textContent =
+                    (currentModel.f1 * 100).toFixed(1) + '%';
+                document.getElementById('modelType').textContent = `Type: ${currentModel.class || 'Classifier'}`;
             }
         }
 
@@ -556,7 +669,7 @@
             Object.entries(allModels).forEach(([id, model]) => {
                 const isActive = currentModel && currentModel.id === id;
                 const col = document.createElement('div');
-                col.className = 'col-md-4';
+                col.className = 'col-md-3 mb-3';
                 col.innerHTML = `
                     <div class="card model-card ${isActive ? 'active' : ''}"
                          onclick="switchModel('${id}')">
@@ -578,6 +691,14 @@
                                     <small class="text-muted">Recall</small>
                                 </div>
                             </div>
+                            <div class="row mt-2 text-center">
+                                <div class="col-6">
+                                    <small class="text-muted">F1: ${(model.f1 * 100).toFixed(1)}%</small>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted">AUC: ${model.auc ? (model.auc * 100).toFixed(1) + '%' : 'N/A'}</small>
+                                </div>
+                            </div>
                             ${isActive ? '<div class="text-center mt-2"><span class="badge bg-primary">Active</span></div>' : ''}
                         </div>
                     </div>
@@ -594,10 +715,10 @@
                 const isActive = currentModel && currentModel.id === id;
                 const btn = document.createElement('button');
                 btn.type = 'button';
-                btn.className = `btn ${isActive ? 'btn-primary' : 'btn-outline-primary'} col-4 mb-2`;
+                btn.className = `btn ${isActive ? 'btn-primary' : 'btn-outline-primary'} col-6 mb-2`;
                 btn.style.margin = '2px';
                 btn.textContent = model.name.split(' ')[0];
-                btn.title = model.name;
+                btn.title = `${model.name} (Acc: ${(model.accuracy * 100).toFixed(1)}%)`;
                 btn.onclick = () => switchModel(id);
                 container.appendChild(btn);
             });
@@ -652,8 +773,9 @@
                 const data = await response.json();
                 if (data.success) {
                     displayPredictionResult(data);
-                    // Show SHAP button after prediction
+                    // Show SHAP and ROC buttons after prediction
                     document.getElementById('shapButton').style.display = 'block';
+                    document.getElementById('rocButton').style.display = 'block';
                 }
             } catch (error) {
                 console.error('Error making prediction:', error);
@@ -678,6 +800,8 @@
                         ${prediction.class}
                     </h4>
                     <p>Confidence: <strong>${confidence.toFixed(1)}%</strong></p>
+                    <hr>
+                    <p class="mb-0"><strong>Risk Level:</strong> ${prediction.risk_factors.risk_level}</p>
                 </div>
 
                 <h5>Probability Distribution</h5>
@@ -704,7 +828,19 @@
                 <div class="mt-3">
                     <p><strong>Model used:</strong> ${data.model_used.name}</p>
                     <p><strong>Accuracy:</strong> ${(data.model_used.accuracy * 100).toFixed(1)}%</p>
+                    <p><strong>Recall:</strong> ${(data.model_used.recall * 100).toFixed(1)}%</p>
                 </div>
+
+                ${prediction.risk_factors.high_risk_features.length > 0 ? `
+                <div class="alert alert-warning mt-3">
+                    <h6><i class="bi bi-exclamation-triangle"></i> High Risk Features Detected:</h6>
+                    <ul>
+                        ${prediction.risk_factors.high_risk_features.map(f => 
+                            `<li><strong>${f.name}:</strong> ${f.value.toFixed(4)} (above 75th percentile)</li>`
+                        ).join('')}
+                    </ul>
+                </div>
+                ` : ''}
             `;
 
             resultDiv.style.display = 'block';
@@ -717,8 +853,50 @@
                     <p><strong>PCA Coordinates:</strong></p>
                     <p>PC1: ${data.pca_coordinates.pc1.toFixed(4)}</p>
                     <p>PC2: ${data.pca_coordinates.pc2.toFixed(4)}</p>
+                    <p><strong>Distances:</strong></p>
+                    <p>To Benign: ${data.pca_coordinates.distance_to_benign_center.toFixed(4)}</p>
+                    <p>To Malignant: ${data.pca_coordinates.distance_to_malignant_center.toFixed(4)}</p>
                     <p class="small text-muted">This prediction is located at these coordinates in the PCA plot</p>
                 `;
+            }
+
+            // Update business impact
+            if (data.business_impact) {
+                const bizImpact = data.business_impact;
+                contentDiv.innerHTML += `
+                    <div class="alert alert-info mt-3">
+                        <h6><i class="bi bi-briefcase"></i> Business Impact:</h6>
+                        <ul>
+                            <li>Early Detection: ${bizImpact.supports_bo1 ? '✅ Supported' : '⚠️ Not supported'}</li>
+                            <li>Faster Diagnosis: ${bizImpact.supports_bo2 ? '✅ Supported' : '⚠️ Not supported'}</li>
+                            <li>Confidence Level: <span class="badge ${bizImpact.confidence_level === 'HIGH' ? 'bg-success' : bizImpact.confidence_level === 'MEDIUM' ? 'bg-warning' : 'bg-danger'}">${bizImpact.confidence_level}</span></li>
+                            <li>Recommended Action: <strong>${bizImpact.recommended_action}</strong></li>
+                        </ul>
+                    </div>
+                `;
+            }
+        }
+
+        async function getROCAnalysis() {
+            try {
+                const response = await fetch('/analysis/roc');
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('rocCard').style.display = 'block';
+                    document.getElementById('rocContent').innerHTML = `
+                        <div class="text-center">
+                            <img src="data:image/png;base64,${data.plot}" class="img-fluid rounded mb-3" alt="ROC Curve">
+                        </div>
+                        <div class="alert ${data.quality.excellent ? 'alert-success' : data.quality.good ? 'alert-info' : data.quality.fair ? 'alert-warning' : 'alert-danger'}">
+                            <h6><i class="bi bi-${data.quality.excellent ? 'trophy' : data.quality.good ? 'check-circle' : data.quality.fair ? 'exclamation-triangle' : 'exclamation-circle'}"></i> 
+                            AUC: ${data.auc.toFixed(3)} - ${data.interpretation}</h6>
+                            <p class="mb-0">${data.clinical_significance}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading ROC analysis:', error);
             }
         }
 
@@ -749,17 +927,19 @@
             }
             document.getElementById('predictionResult').style.display = 'none';
             document.getElementById('shapResultCard').style.display = 'none';
+            document.getElementById('rocCard').style.display = 'none';
         }
 
         async function retrainModels() {
-            if (confirm('Are you sure you want to retrain all models? This may take a few moments.')) {
+            if (confirm('Are you sure you want to retrain all 8 models? This may take a few moments.')) {
                 try {
                     const response = await fetch('/retrain', { method: 'POST' });
                     const data = await response.json();
                     if (data.success) {
-                        alert('✅ Models retrained successfully!');
+                        alert('✅ 8 models retrained successfully!');
                         loadAllModels();
                         loadPCA();
+                        loadArtifactInfo();
                     } else {
                         alert('Failed to retrain models');
                     }
@@ -768,6 +948,43 @@
                     alert('Error retraining models');
                 }
             }
+        }
+
+        function showBestModels() {
+            document.getElementById('bestModelsCard').style.display = 'block';
+            updateBestModelsDisplay();
+        }
+
+        function updateBestModelsDisplay() {
+            const container = document.getElementById('bestModelsContent');
+            if (!bestModels || Object.keys(bestModels).length === 0) {
+                container.innerHTML = '<p class="text-muted">No best models data available</p>';
+                return;
+            }
+
+            let html = '';
+            for (const [metric, modelId] of Object.entries(bestModels)) {
+                if (modelId && allModels[modelId]) {
+                    const model = allModels[modelId];
+                    html += `
+                        <div class="col-md-3">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <h6 class="text-uppercase small text-muted">Best by ${metric}</h6>
+                                    <h5>${model.name}</h5>
+                                    <div class="display-6 ${metric === 'accuracy' ? 'text-success' : metric === 'recall' ? 'text-info' : 'text-warning'}">
+                                        ${(model[metric] * 100).toFixed(1)}%
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-primary mt-2" onclick="switchModel('${modelId}')">
+                                        Select
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+            container.innerHTML = html;
         }
 
         async function loadPCA() {
@@ -814,6 +1031,10 @@
                    Active Model: <strong>${data.active_model}</strong></p>
                 <p><i class="bi bi-circle-fill text-success"></i>
                    Accuracy: <strong>${(data.model_accuracy * 100).toFixed(1)}%</strong></p>
+                <p><i class="bi bi-circle-fill text-success"></i>
+                   F1 Score: <strong>${(data.model_f1 * 100).toFixed(1)}%</strong></p>
+                <p><i class="bi bi-circle-fill text-info"></i>
+                   Artifacts: <strong>${data.artifact_system}</strong></p>
             `;
 
             // Update metrics
@@ -823,8 +1044,107 @@
             document.getElementById('featuresCount').textContent = data.features_count;
         }
 
+        async function loadBusinessObjectives() {
+            try {
+                const response = await fetch('/objectives/status');
+                const data = await response.json();
+                
+                const container = document.getElementById('businessObjectives');
+                let html = '<div class="row">';
+                
+                // Business Objectives
+                html += '<div class="col-md-6"><h6>Business Objectives:</h6>';
+                for (const [id, obj] of Object.entries(data.business_objectives || {})) {
+                    html += `
+                        <div class="alert ${obj.achieved ? 'alert-success' : 'alert-warning'} p-2 mb-2">
+                            <h6 class="mb-1">${obj.name}</h6>
+                            <div class="progress" style="height: 10px;">
+                                <div class="progress-bar ${obj.achieved ? 'bg-success' : 'bg-warning'}" 
+                                     style="width: ${Math.min(100, (obj.current_value / obj.target) * 100)}%"></div>
+                            </div>
+                            <small>${obj.current_value.toFixed(1)}% / ${obj.target}% - ${obj.achieved ? '✅ Achieved' : '⚠️ Needs improvement'}</small>
+                        </div>
+                    `;
+                }
+                html += '</div>';
+                
+                // Data Science Objectives
+                html += '<div class="col-md-6"><h6>Data Science Objectives:</h6>';
+                for (const [id, obj] of Object.entries(data.data_science_objectives || {})) {
+                    html += `
+                        <div class="alert ${obj.achieved ? 'alert-success' : 'alert-warning'} p-2 mb-2">
+                            <h6 class="mb-1">${obj.name}</h6>
+                            <p class="mb-1 small">${obj.target} - Current: ${obj.current_value.toFixed(1)}%</p>
+                            <small>Best Model: ${obj.best_model} - ${obj.achieved ? '✅ Achieved' : '⚠️ Needs improvement'}</small>
+                        </div>
+                    `;
+                }
+                html += '</div>';
+                
+                html += '</div>';
+                
+                // Overall achievement
+                if (data.overall_achievement) {
+                    html += `
+                        <div class="alert alert-info mt-3">
+                            <h6><i class="bi bi-trophy"></i> Overall Achievement:</h6>
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <div class="display-6">${data.overall_achievement.business.toFixed(0)}%</div>
+                                    <small>Business Objectives</small>
+                                </div>
+                                <div class="col-6">
+                                    <div class="display-6">${data.overall_achievement.data_science.toFixed(0)}%</div>
+                                    <small>Data Science Objectives</small>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                container.innerHTML = html;
+            } catch (error) {
+                console.error('Error loading business objectives:', error);
+            }
+        }
+
+        async function loadArtifactInfo() {
+            try {
+                const response = await fetch('/artifacts/info');
+                const data = await response.json();
+                
+                const container = document.getElementById('artifactInfo');
+                if (data.success) {
+                    container.innerHTML = `
+                        <div class="alert alert-success">
+                            <h6><i class="bi bi-check-circle"></i> Artifact System Active</h6>
+                            <p><strong>Total Artifacts:</strong> ${data.artifact_count}</p>
+                            <p><strong>Models Registered:</strong> ${data.models_registered}</p>
+                            <p><strong>Last Updated:</strong> ${new Date(data.last_updated).toLocaleString()}</p>
+                            <p><strong>Directory:</strong> ${data.artifact_directory}</p>
+                            <p><strong>Available Models:</strong> ${data.models ? data.models.join(', ') : 'None'}</p>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = `
+                        <div class="alert alert-warning">
+                            <h6><i class="bi bi-exclamation-triangle"></i> Artifacts Not Generated</h6>
+                            <p>${data.message}</p>
+                            <button class="btn btn-sm btn-primary" onclick="retrainModels()">
+                                <i class="bi bi-arrow-repeat"></i> Generate Artifacts
+                            </button>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading artifact info:', error);
+            }
+        }
+
         function refreshModels() {
             loadAllModels();
+            loadBusinessObjectives();
+            loadArtifactInfo();
             alert('Models refreshed');
         }
 
@@ -846,12 +1166,12 @@
                     break;
                 }
             }
-            
+
             if (!allFeaturesEntered) {
                 alert('Please enter all feature values or load sample data before generating SHAP explanation.');
                 return;
             }
-            
+
             // Collect feature values
             const features = [];
             for (let i = 0; i < 30; i++) {
@@ -864,7 +1184,7 @@
                 }
                 features.push(value);
             }
-            
+
             try {
                 // Show loading state
                 const resultDiv = document.getElementById('shapResultContent');
@@ -874,25 +1194,25 @@
                         <p class="mt-2">Generating SHAP explanation...</p>
                     </div>
                 `;
-                
+
                 // Show the SHAP card
                 document.getElementById('shapResultCard').style.display = 'block';
-                
+
                 // Get current model ID
                 const currentModelId = currentModel ? currentModel.id : 'mlp';
-                
+
                 // Call SHAP API
                 const response = await fetch('/shap/explain', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
+                    body: JSON.stringify({
                         features: features,
                         model_id: currentModelId
                     })
                 });
-                
+
                 const data = await response.json();
-                
+
                 if (data.success) {
                     displaySHAPResults(data);
                 } else if (data.available === false) {
@@ -901,7 +1221,7 @@
                 } else {
                     alert('Error: ' + (data.error || data.message));
                 }
-                
+
             } catch (error) {
                 console.error('SHAP Error:', error);
                 displaySHAPSimulation(features, error.message);
@@ -910,21 +1230,21 @@
 
         function displaySHAPResults(data) {
             const container = document.getElementById('shapResultContent');
-            
+
             let html = '';
-            
+
             // Display force plot if available
             if (data.plot && data.plot.data) {
                 html += `
                     <h6>Force Plot Visualization</h6>
                     <img src="data:image/png;base64,${data.plot.data}" class="img-fluid mb-3 rounded" alt="SHAP Force Plot">
                     <div class="alert alert-light small mb-3">
-                        <strong>Interpretation:</strong> Features pushing to the right (red) increase cancer risk, 
+                        <strong>Interpretation:</strong> Features pushing to the right (red) increase cancer risk,
                         features pushing left (blue) decrease risk.
                     </div>
                 `;
             }
-            
+
             // Display top features
             html += `
                 <h6>Top Contributing Features</h6>
@@ -940,11 +1260,11 @@
                         </thead>
                         <tbody>
             `;
-            
+
             (data.top_features || []).forEach(feature => {
                 const rowClass = feature.impact > 0 ? 'table-danger' : 'table-success';
                 const impactIcon = feature.impact > 0 ? '↑' : '↓';
-                
+
                 html += `
                     <tr class="${rowClass}">
                         <td><strong>${feature.name}</strong></td>
@@ -954,12 +1274,12 @@
                     </tr>
                 `;
             });
-            
+
             html += `
                         </tbody>
                     </table>
                 </div>
-                
+
                 <div class="alert alert-info mt-3">
                     <h6><i class="bi bi-info-circle"></i> Explanation</h6>
                     <p><strong>Base Value:</strong> ${data.base_value ? data.base_value.toFixed(4) : 'N/A'} (average prediction)</p>
@@ -968,13 +1288,13 @@
                     ${data.prediction_value ? `<p><strong>Final Prediction Value:</strong> ${data.prediction_value.toFixed(4)}</p>` : ''}
                 </div>
             `;
-            
+
             container.innerHTML = html;
         }
 
         function displaySHAPSimulation(features, errorMessage) {
             const container = document.getElementById('shapResultContent');
-            
+
             // Create simulated SHAP values based on feature values
             // Higher values for certain features = more likely malignant
             const featureImportanceMap = {
@@ -982,14 +1302,14 @@
                 'area_worst': 0.64, 'concavity_mean': 0.58, 'texture_worst': 0.42,
                 'smoothness_worst': 0.38, 'compactness_worst': 0.35
             };
-            
+
             const mockFeatures = features.map((value, idx) => {
                 const featureName = featureNames[idx] || `Feature ${idx + 1}`;
                 const baseImportance = featureImportanceMap[featureName] || 0.2;
-                
+
                 // Simulate impact: higher value + importance = higher impact
                 const impact = (value - 10) * baseImportance * 0.05 + (Math.random() - 0.5) * 0.1;
-                
+
                 return {
                     name: featureName,
                     value: value,
@@ -998,20 +1318,20 @@
                     importance: Math.abs(impact)
                 };
             }).sort((a, b) => b.importance - a.importance).slice(0, 10);
-            
+
             let html = `
                 <div class="alert alert-warning">
                     <i class="bi bi-exclamation-triangle"></i>
                     <strong>SHAP Analysis Simulation</strong>
                     <p class="mb-0">${errorMessage || 'SHAP package not installed. This is a simulation of what real SHAP would show.'}</p>
                 </div>
-                
+
                 <div class="alert alert-info">
                     <h6><i class="bi bi-download"></i> To enable real SHAP:</h6>
                     <code>pip install shap</code>
                     <p class="mt-2 small">Then restart your server for actual mathematical feature importance analysis.</p>
                 </div>
-                
+
                 <h6>Simulated Feature Impact</h6>
                 <div class="table-responsive">
                     <table class="table table-sm table-hover">
@@ -1025,11 +1345,11 @@
                         </thead>
                         <tbody>
             `;
-            
+
             mockFeatures.forEach(feature => {
                 const rowClass = feature.impact > 0 ? 'table-danger' : 'table-success';
                 const impactIcon = feature.impact > 0 ? '↑' : '↓';
-                
+
                 html += `
                     <tr class="${rowClass}">
                         <td><strong>${feature.name}</strong></td>
@@ -1039,18 +1359,18 @@
                     </tr>
                 `;
             });
-            
+
             html += `
                         </tbody>
                     </table>
                 </div>
-                
+
                 <div class="alert alert-light mt-3">
                     <h6><i class="bi bi-info-circle"></i> How real SHAP works:</h6>
                     <p class="small mb-0">Real SHAP uses game theory to mathematically calculate how much each feature contributes to the prediction. It provides consistent and fair feature attributions.</p>
                 </div>
             `;
-            
+
             container.innerHTML = html;
         }
     </script>

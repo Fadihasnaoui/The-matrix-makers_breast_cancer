@@ -1,78 +1,260 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Live API Dashboard</title>
+    <title>Live API Dashboard v5.0</title>
     <meta http-equiv="refresh" content="10">
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .metric { background: #f5f5f5; padding: 15px; margin: 10px 0; border-radius: 5px; }
-        .metric h3 { margin-top: 0; }
-        .value { font-size: 24px; font-weight: bold; }
-        .up { color: green; }
-        .down { color: red; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 20px;
+            background: #f5f5f5;
+        }
+        
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .metric-card {
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-left: 4px solid #667eea;
+        }
+        
+        .metric-card.good { border-left-color: #28a745; }
+        .metric-card.warning { border-left-color: #ffc107; }
+        .metric-card.danger { border-left-color: #dc3545; }
+        .metric-card.info { border-left-color: #17a2b8; }
+        
+        .metric-title {
+            font-size: 14px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        
+        .metric-value {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .metric-desc {
+            font-size: 12px;
+            color: #888;
+            margin-top: 5px;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        .status-healthy { background: #d4edda; color: #155724; }
+        .status-warning { background: #fff3cd; color: #856404; }
+        .status-danger { background: #f8d7da; color: #721c24; }
+        
+        .last-update {
+            color: #666;
+            font-size: 12px;
+            text-align: right;
+            margin-top: 20px;
+        }
+        
+        .models-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .model-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #dee2e6;
+        }
+        
+        .model-name {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .model-accuracy {
+            font-size: 24px;
+            font-weight: bold;
+            color: #28a745;
+        }
     </style>
 </head>
 <body>
-    <h1>📈 Live API Dashboard</h1>
-    <p>Auto-refreshes every 10 seconds | Last update: <span id="time"></span></p>
-    
-    <div class="metric">
-        <h3>API Status</h3>
-        <div class="value" id="status">Checking...</div>
+    <div class="dashboard-container">
+        <h1>📈 Live API Dashboard v5.0</h1>
+        <p>Auto-refreshes every 10 seconds | 8 Models | ROC Analysis | Artifact System</p>
+        
+        <div class="last-update">
+            Last update: <span id="time"></span>
+        </div>
+
+        <div class="metric-grid">
+            <div class="metric-card good" id="statusCard">
+                <div class="metric-title">API Status</div>
+                <div class="metric-value" id="status">Checking...</div>
+                <div class="metric-desc">System health and availability</div>
+            </div>
+            
+            <div class="metric-card info">
+                <div class="metric-title">Total Requests</div>
+                <div class="metric-value" id="totalRequests">0</div>
+                <div class="metric-desc">Lifetime API requests</div>
+            </div>
+            
+            <div class="metric-card info">
+                <div class="metric-title">Predictions Made</div>
+                <div class="metric-value" id="predictions">0</div>
+                <div class="metric-desc">Breast cancer predictions</div>
+            </div>
+            
+            <div class="metric-card warning">
+                <div class="metric-title">Memory Usage</div>
+                <div class="metric-value" id="memory">0 MB</div>
+                <div class="metric-desc">System memory consumption</div>
+            </div>
+            
+            <div class="metric-card good">
+                <div class="metric-title">Model Accuracy</div>
+                <div class="metric-value" id="accuracy">0%</div>
+                <div class="metric-desc">Best model accuracy</div>
+            </div>
+            
+            <div class="metric-card info">
+                <div class="metric-title">Active Models</div>
+                <div class="metric-value" id="activeModels">0</div>
+                <div class="metric-desc">Trained models available</div>
+            </div>
+            
+            <div class="metric-card info">
+                <div class="metric-title">Uptime</div>
+                <div class="metric-value" id="uptime">0</div>
+                <div class="metric-desc">System uptime in minutes</div>
+            </div>
+            
+            <div class="metric-card good">
+                <div class="metric-title">ROC AUC</div>
+                <div class="metric-value" id="auc">0.00</div>
+                <div class="metric-desc">Diagnostic performance</div>
+            </div>
+        </div>
+        
+        <h3 style="margin-top: 30px;">🔄 8 Available Models</h3>
+        <div class="models-grid" id="modelsList">
+            <!-- Models will be loaded here -->
+        </div>
+        
+        <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+            <h4>📊 Quick Links</h4>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <a href="/" style="padding: 8px 15px; background: #667eea; color: white; text-decoration: none; border-radius: 5px;">Main Dashboard</a>
+                <a href="/analysis" style="padding: 8px 15px; background: #20c997; color: white; text-decoration: none; border-radius: 5px;">Complete Analysis</a>
+                <a href="/analysis/roc" style="padding: 8px 15px; background: #fd7e14; color: white; text-decoration: none; border-radius: 5px;">ROC Analysis</a>
+                <a href="/docs" style="padding: 8px 15px; background: #6f42c1; color: white; text-decoration: none; border-radius: 5px;">API Docs</a>
+                <a href="/metrics" style="padding: 8px 15px; background: #17a2b8; color: white; text-decoration: none; border-radius: 5px;">Prometheus</a>
+            </div>
+        </div>
     </div>
-    
-    <div class="metric">
-        <h3>Total Requests</h3>
-        <div class="value" id="totalRequests">0</div>
-    </div>
-    
-    <div class="metric">
-        <h3>Predictions Made</h3>
-        <div class="value" id="predictions">0</div>
-    </div>
-    
-    <div class="metric">
-        <h3>Memory Usage</h3>
-        <div class="value" id="memory">0 MB</div>
-    </div>
-    
-    <div class="metric">
-        <h3>Model Accuracy</h3>
-        <div class="value" id="accuracy">0%</div>
-    </div>
-    
+
     <script>
         // Update time
         document.getElementById('time').textContent = new Date().toLocaleTimeString();
-        
+
         // Fetch data
         async function updateMetrics() {
             try {
                 // API health
                 const healthRes = await fetch('/health');
                 const health = await healthRes.json();
-                document.getElementById('status').textContent = health.status.toUpperCase();
-                document.getElementById('status').className = 'value ' + (health.status === 'healthy' ? 'up' : 'down');
+                
+                const statusElem = document.getElementById('status');
+                const statusCard = document.getElementById('statusCard');
+                
+                statusElem.textContent = health.status.toUpperCase();
+                
+                // Update status card class
+                statusCard.className = 'metric-card ' + 
+                    (health.status === 'healthy' ? 'good' : 
+                     health.status === 'warning' ? 'warning' : 'danger');
                 
                 // Model info
                 const modelRes = await fetch('/model/info');
                 const model = await modelRes.json();
-                if (model.status === 'loaded') {
+                if (model.status === 'loaded' || model.accuracy) {
                     document.getElementById('accuracy').textContent = (model.accuracy * 100).toFixed(1) + '%';
                 }
                 
+                // Load models
+                const modelsRes = await fetch('/models');
+                const models = await modelsRes.json();
+                
+                if (models.available_models) {
+                    const modelCount = Object.keys(models.available_models).length;
+                    document.getElementById('activeModels').textContent = modelCount;
+                    
+                    // Display models
+                    const modelsList = document.getElementById('modelsList');
+                    let modelsHtml = '';
+                    
+                    Object.values(models.available_models).forEach(model => {
+                        modelsHtml += `
+                            <div class="model-card">
+                                <div class="model-name">${model.name.split(' ')[0]}</div>
+                                <div class="model-accuracy">${(model.accuracy * 100).toFixed(1)}%</div>
+                                <div style="font-size: 12px; color: #666;">${model.class}</div>
+                            </div>
+                        `;
+                    });
+                    
+                    modelsList.innerHTML = modelsHtml;
+                }
+
                 // Health contains some metrics
                 document.getElementById('predictions').textContent = health.predictions_made || 0;
-                
+                document.getElementById('uptime').textContent = Math.floor(health.uptime_seconds / 60);
+
                 // Get more metrics from /metrics
                 const metricsRes = await fetch('/metrics');
                 const metrics = await metricsRes.text();
-                
+
                 // Parse metrics
                 const lines = metrics.split('\n');
                 let totalRequests = 0;
                 let memory = 0;
-                
+
                 for (const line of lines) {
                     if (line.startsWith('http_requests_total')) {
                         const value = line.split(' ')[1];
@@ -82,17 +264,26 @@
                         const value = line.split(' ')[1];
                         memory = Math.round(parseFloat(value) / 1024 / 1024);
                     }
+                    if (line.startsWith('api_model_auc')) {
+                        const value = line.split(' ')[1];
+                        document.getElementById('auc').textContent = parseFloat(value).toFixed(3);
+                    }
                 }
-                
+
                 document.getElementById('totalRequests').textContent = totalRequests;
                 document.getElementById('memory').textContent = memory + ' MB';
-                
+
             } catch (error) {
                 console.error('Error fetching metrics:', error);
+                document.getElementById('status').textContent = 'ERROR';
+                document.getElementById('statusCard').className = 'metric-card danger';
             }
         }
-        
+
         updateMetrics();
+        
+        // Auto-refresh metrics every 5 seconds (in addition to page refresh)
+        setInterval(updateMetrics, 5000);
     </script>
 </body>
 </html>

@@ -85,3 +85,15 @@ quick-test.py
 
 # Email test files
 test-email-now.py
+
+# Backup files
+*.backup*
+*backup-*
+*_fixed.py
+*_old.py
+*~
+
+# Version backups
+*.v*-backup
+*.backup-*
+*_backup.py
