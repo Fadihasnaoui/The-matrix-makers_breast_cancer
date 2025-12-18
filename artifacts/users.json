@@ -1,0 +1,26 @@
+{
+  "farouk.chenni@esprit.tn": {
+    "email": "farouk.chenni@esprit.tn",
+    "hashed_password": "$2b$12$tSDuyOZc63gPicx6s2wlfuUWP7dUAPtHdggZWZBLdqpGj.gyZkcyu",
+    "role": "scientist",
+    "created_at": "2025-12-17T17:18:08.212424+00:00"
+  },
+  "azer58134@gmail.com": {
+    "email": "azer58134@gmail.com",
+    "hashed_password": "$2b$12$6jwe4U8Y7K0o2iMAcRphkeeEUSNyNyTfbfzSJ2MEElBZDy4geMShy",
+    "role": "data_scientist",
+    "created_at": "2025-12-17T17:24:27.963807+00:00"
+  },
+  "sdfghj@fg.i": {
+    "email": "sdfghj@fg.i",
+    "hashed_password": "$2b$12$l7NdAqLFuVy4gvXAZNUPI.0t1F6jTIiq44ARhRB9SPlKuThzVomBC",
+    "role": "scientist",
+    "created_at": "2025-12-17T17:32:32.819050+00:00"
+  },
+  "fff@hh.com": {
+    "email": "fff@hh.com",
+    "hashed_password": "$2b$12$NETFOhhg7raaRk/J7YHpUubKEQWYQp9Wc6Y4fjCSBbpb87Pz89ydq",
+    "role": "scientist",
+    "created_at": "2025-12-17T18:51:22.693988+00:00"
+  }
+}
