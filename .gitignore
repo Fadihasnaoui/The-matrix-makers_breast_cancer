@@ -1,0 +1,19 @@
+# Python
+.venv/
+API/venv/
+__pycache__/
+*.pyc
+
+# Node
+node_modules/
+dist/
+
+# Env
+.env
+.env.*
+
+# IDE
+.vscode/
+
+# OS
+.DS_Store

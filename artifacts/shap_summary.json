@@ -1,0 +1,10 @@
+{
+  "k-nn_(optimized)": {
+    "plot_file": "k-nn_(optimized)_summary.png",
+    "description": "Global SHAP summary for L2NN (Euclidean)."
+  },
+  "random_forest": {
+    "plot_file": "random_forest_summary.png",
+    "description": "Global SHAP summary for Random Forest."
+  }
+}
