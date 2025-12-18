@@ -1,148 +1,246 @@
-# Breast Cancer Diagnosis — Machine Learning Project (CRISP-DM)
+Breast Cancer Diagnosis — Machine Learning Project (CRISP-DM)
+📌 Project Overview
 
-## 📌 Project Overview
-This project applies machine learning techniques to support **breast cancer diagnosis**, with a strong focus on **early detection**, **clinical reliability**, and **interpretability**.  
-The work follows the **CRISP-DM methodology**, ensuring a structured, transparent, and medically aligned data science process.
+This project applies machine learning techniques to support breast cancer diagnosis, with a strong focus on early detection, clinical reliability, and model interpretability.
+The work follows the CRISP-DM methodology, ensuring a structured, transparent, and medically aligned data science process.
 
-The objective is to assist clinicians in distinguishing between **benign** and **malignant** tumors using quantitative features extracted from breast cancer datasets.
+Beyond model development, the project includes a fully deployed web-based dashboard that allows users to interact with trained models, visualize predictions, explore explainability (SHAP & LIME), and inspect evaluation metrics.
 
----
+The objective is to assist clinicians and students in distinguishing between benign and malignant tumors using quantitative features extracted from breast cancer datasets.
 
-## 🏥 Business Objectives (BO)
+🏥 Business Objectives (BO)
 
-- **BO1** — Detect breast cancer as early as possible  
-- **BO2** — Improve diagnostic decision-making and reduce errors  
-- **BO3** — Reduce unnecessary tests, biopsies, and medical procedures  
-- **BO4** — Prioritize patients requiring urgent medical attention  
+BO1 — Detect breast cancer as early as possible
 
----
+BO2 — Improve diagnostic decision-making and reduce errors
 
-## 🎯 Data Science Objectives (DSO)
+BO3 — Reduce unnecessary tests, biopsies, and medical procedures
 
-- **DSO1** — Maximize Recall (True Positive Rate) to avoid missing malignant cases  
-- **DSO2** — Minimize False Positives to reduce unnecessary medical interventions  
-- **DSO3** — Ensure fast, interpretable, and clinically actionable models  
-- **DSO4** — Achieve robust generalization across diverse tumor characteristics  
+BO4 — Prioritize patients requiring urgent medical attention
 
----
+🎯 Data Science Objectives (DSO)
 
-## 🧪 Datasets
+DSO1 — Maximize Recall (True Positive Rate) to avoid missing malignant cases
 
-This project uses **two complementary breast cancer datasets**, which were **merged to improve robustness and generalization**.
+DSO2 — Minimize False Positives to reduce unnecessary medical interventions
 
-### 1️⃣ Wisconsin Diagnostic Breast Cancer (WDBC)
-- Features extracted from digitized images of breast mass fine needle aspirates
-- Includes **mean**, **standard error**, and **worst-case** measurements
-- Binary target variable:  
-  - `0` → Benign  
-  - `1` → Malignant  
+DSO3 — Ensure fast, interpretable, and clinically actionable models
 
-### 2️⃣ Wisconsin Prognostic Breast Cancer (WPBC)
-- Contains tumor-related features associated with disease progression
-- Introduces additional variability in tumor morphology
-- Used to enrich the dataset and improve generalization
+DSO4 — Achieve robust generalization across diverse tumor characteristics
 
-### 🔗 Dataset Integration
-- Common and compatible features between **WDBC** and **WPBC** were identified
-- Datasets were **cleaned, aligned, and merged**
-- The merged dataset improves:
-  - tumor heterogeneity representation
-  - robustness across patient profiles (**DSO4**)
+🧪 Datasets
 
----
+This project uses two complementary breast cancer datasets, which were merged to improve robustness and generalization.
 
-## 🔍 Methodology — CRISP-DM Phases
+1️⃣ Wisconsin Diagnostic Breast Cancer (WDBC)
 
-### Phase 1 — Business Understanding
+Features extracted from digitized images of breast mass fine needle aspirates
+
+Includes mean, standard error, and worst-case measurements
+
+Binary target variable:
+
+0 → Benign
+
+1 → Malignant
+
+2️⃣ Wisconsin Prognostic Breast Cancer (WPBC)
+
+Contains tumor-related features associated with disease progression
+
+Consists exclusively of malignant cases
+
+Used to enrich the dataset and increase malignant class representation
+
+🔗 Dataset Integration
+
+Common and compatible features between WDBC and WPBC were identified
+
+Datasets were cleaned, aligned, and merged
+
+The enriched dataset improves:
+
+class balance
+
+tumor heterogeneity representation
+
+robustness across patient profiles (DSO4)
+
+🔍 Methodology — CRISP-DM Phases
+Phase 1 — Business Understanding
+
 Clinical and diagnostic objectives were defined to ensure alignment between machine learning performance and real medical needs.
 
----
+Phase 2 — Data Understanding
 
-### Phase 2 — Data Understanding
-- Exploratory Data Analysis (EDA)
-- Analysis of class distribution (benign vs malignant)
-- Box plots for mean, standard error, and worst features
-- Detection of variability, scale differences, and outliers
-- Clinical interpretation of extreme values
+Exploratory Data Analysis (EDA)
 
----
+Class distribution analysis (benign vs malignant)
 
-### Phase 3 — Data Preparation
-- Harmonization of WDBC and WPBC features
-- Handling of missing and inconsistent values
-- Feature standardization
-- **Principal Component Analysis (PCA)**:
-  - Dimensionality reduction
-  - Analysis of feature representation (cos²)
-  - Identification of dominant tumor characteristics
-- Train/test split
-- Retention of clinically meaningful outliers
+Box plots for mean, standard error, and worst features
 
----
+Correlation analysis and clinical interpretation of feature behavior
 
-### Phase 4 — Modeling
+Identification of clinically meaningful outliers
+
+Phase 3 — Data Preparation
+
+Harmonization of WDBC and WPBC features
+
+Removal of non-informative identifiers
+
+Feature standardization
+
+Principal Component Analysis (PCA):
+
+Dimensionality analysis
+
+Feature representation quality (cos²)
+
+Stratified train/test split
+
+Retention of medically meaningful extreme values
+
+Phase 4 — Modeling
+
 The following models were trained and compared:
 
-- Linear Regression (baseline)
-- ElasticNet Logistic Regression
-- Linear SVM (C tuned)
-- RBF SVM (GRU-SVM Proxy)
-- L1NN / L2NN (Manhattan / Euclidean k-NN)
-- Random Forest
-- MLP (500-500-500 with Early Stopping)
+Linear Regression (baseline)
 
----
+ElasticNet Logistic Regression
 
-### Phase 5 — Evaluation
-- Accuracy, Recall (TPR), Selectivity (TNR), FPR, FNR
-- Confusion matrices
-- ROC curves and AUC comparison
-- Model-to-DSO alignment analysis
-- Clinical error analysis (false positives vs false negatives)
+Linear SVM (C tuned)
 
----
+RBF SVM (GRU-SVM Proxy)
 
-## 🏆 Model Recommendation (Summary)
+L1NN / L2NN (Manhattan / Euclidean k-NN)
 
-- **Primary Screening Model:** MLP (Early Stopping) — optimized for high Recall  
-- **Interpretable Clinical Model:** ElasticNet Logistic Regression  
-- **Robust Validation Model:** Random Forest  
+Random Forest
 
-A **hybrid decision-support strategy** is recommended rather than relying on a single model.
+MLP (500–500–500 with Early Stopping)
 
----
+Models were selected to cover different trade-offs between recall, specificity, interpretability, and generalization.
 
-## 📊 Key Visualizations
-- Box plots (Mean / SE / Worst features)
-- ROC curves for all evaluated models
-- Confusion matrices
-- PCA cos² heatmap (feature representation quality)
-- LIME explanations for model interpretability
+Phase 5 — Evaluation
 
----
+Accuracy, Recall (TPR), Specificity (TNR)
 
-## 🚀 Deployment (Planned — Not Implemented Yet)
+False Positive Rate (FPR) and False Negative Rate (FNR)
 
-> This section is intentionally left for future work.
+Confusion matrices
 
-Planned deployment considerations include:
-- Model serialization
-- API-based inference service
-- Clinical decision-support integration
-- Threshold calibration based on hospital policy
-- Monitoring model performance and data drift
+ROC curves and AUC comparison
 
----
+Model-to-DSO alignment analysis
 
-## ⚠️ Disclaimer
-This project is for **educational and research purposes only**.  
-It is **not a medical device** and should not be used for clinical diagnosis without proper validation and regulatory approval.
+Clinical risk analysis with emphasis on false negatives
 
----
+🏆 Model Recommendation (Summary)
 
-## 👥 Team
-**The Matrix-Makers**  
-Data Science & Machine Learning Project Team
+Rather than relying on a single model, the project adopts a decision-support perspective:
 
----
+Primary high-capacity model: MLP (Early Stopping) — strong recall and generalization
 
+Clinically interpretable model: ElasticNet Logistic Regression
+
+Robust ensemble model: Random Forest
+
+This hybrid approach balances performance, interpretability, and clinical safety.
+
+📊 Explainability & Transparency
+
+To support clinical trust:
+
+SHAP is used for global and local feature impact analysis
+
+LIME is used for instance-level explanations
+
+Explanations are visualized directly in the deployed dashboard
+
+Feature contributions are consistent with known tumor morphology indicators
+
+🚀 Deployment (Implemented)
+
+This project includes a fully functional deployment, demonstrating how machine learning models can be integrated into a real-world application.
+
+🏗️ Deployment Architecture
+
+The system follows a client–server architecture:
+
+Frontend: React (Vite), hosted on Vercel
+
+Backend: FastAPI (Python), hosted on Render
+
+ML Layer: Pre-trained scikit-learn models with SHAP & LIME explainability
+
+Security: JWT-based authentication and HTTPS communication
+
+End User
+   ↓
+React Dashboard (Vercel)
+   ↓ REST API
+FastAPI Backend (Render)
+   ↓
+ML Models + SHAP/LIME
+
+🧰 Technologies Used
+
+Frontend: React (Vite), Recharts, Tailwind
+
+Backend: FastAPI, Python
+
+Machine Learning: scikit-learn
+
+Explainability: SHAP, LIME
+
+Authentication: JWT
+
+Hosting: Vercel (frontend), Render (backend)
+
+🔄 Application Workflow
+
+User accesses the web dashboard
+
+User logs in (JWT authentication)
+
+User submits feature values for prediction
+
+Backend:
+
+Performs inference
+
+Generates SHAP and LIME explanations
+
+Returns evaluation metrics
+
+Results are visualized interactively in the dashboard
+
+📊 Monitoring & Reliability
+
+API availability monitored via hosting platforms
+
+Error handling implemented at backend level
+
+Response time suitable for real-time interaction
+
+Free-tier hosting may introduce cold-start latency
+
+⚠️ Deployment Limitations
+
+Hosted on free cloud tiers (non-guaranteed uptime)
+
+No persistent clinical database
+
+No regulatory certification
+
+Intended for academic and educational use
+
+⚠️ Disclaimer
+
+This project is for educational and research purposes only.
+It is not a medical device and must not be used for clinical diagnosis without proper validation and regulatory approval.
+
+👥 Team
+
+The Matrix-Makers
+Machine Learning & Data Science Project Team
