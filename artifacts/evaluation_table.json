@@ -1,0 +1,32 @@
+[
+  {
+    "model_id": "k-nn_(optimized)",
+    "model_name": "L2NN (Euclidean)",
+    "accuracy": 0.9956709956709957,
+    "precision": 0.9919354838709677,
+    "recall": 1.0,
+    "specificity": 0.9907407407407407,
+    "fnr": 0.0,
+    "f1": 0.9959514170040485,
+    "auc": 0.9997741644083108,
+    "tn": 107,
+    "fp": 1,
+    "fn": 0,
+    "tp": 123
+  },
+  {
+    "model_id": "random_forest",
+    "model_name": "Random Forest",
+    "accuracy": 0.9913419913419913,
+    "precision": 0.991869918699187,
+    "recall": 0.991869918699187,
+    "specificity": 0.9907407407407407,
+    "fnr": 0.008130081300813009,
+    "f1": 0.991869918699187,
+    "auc": 0.9998118036735923,
+    "tn": 107,
+    "fp": 1,
+    "fn": 1,
+    "tp": 122
+  }
+]

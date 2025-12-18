@@ -1,0 +1,23 @@
+{
+  "dataset_name": "Breast Cancer (enriched)",
+  "data_file": "data/data_enriched.csv",
+  "n_samples": 767,
+  "n_features": 31,
+  "target": "diagnosis",
+  "class_names": [
+    "Benign",
+    "Malignant"
+  ],
+  "class_counts": {
+    "0": 357,
+    "1": 410
+  },
+  "class_balance": {
+    "0": 0.4654,
+    "1": 0.5346
+  },
+  "split": {
+    "test_ratio": 0.2
+  },
+  "positive_class": 1
+}

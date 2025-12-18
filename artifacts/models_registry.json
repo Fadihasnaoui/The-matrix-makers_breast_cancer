@@ -1,0 +1,26 @@
+{
+  "k-nn_(k=5)": {
+    "name": "k-NN (k=5)",
+    "file": "model_k-nn_(k=5).joblib"
+  },
+  "k-nn_(optimized)": {
+    "name": "k-NN (Optimized)",
+    "file": "model_k-nn_(optimized).joblib"
+  },
+  "linear_svm": {
+    "name": "Linear SVM",
+    "file": "model_linear_svm.joblib"
+  },
+  "mlp_(500-500-500)": {
+    "name": "MLP (500-500-500)",
+    "file": "model_mlp_(500-500-500).joblib"
+  },
+  "gru-svm_(proxy)": {
+    "name": "GRU-SVM (Proxy)",
+    "file": "model_gru-svm_(proxy).joblib"
+  },
+  "random_forest": {
+    "name": "Random Forest",
+    "file": "model_random_forest.joblib"
+  }
+}
